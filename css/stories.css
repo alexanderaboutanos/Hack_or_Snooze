@@ -16,8 +16,21 @@
   margin: 20px 30px;
 }
 
-
 /* Individual stories */
+
+/* Individual story Icons */
+.fav-star:before {
+  content: "\2606";
+}
+.empty-star:before {
+  content: "\2606";
+}
+.filled-star:before {
+  content: "\2605";
+}
+.garbage-can:before {
+  content: "\2620";
+}
 
 .story-link {
   color: black;

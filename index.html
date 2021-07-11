@@ -38,6 +38,8 @@
       </div>
       <div class="main-nav-links hidden">
         | <a class="nav-link" href="#" id="nav-submit">submit</a> |
+        <a class="nav-link" href="#" id="nav-favorites">favorites</a> |
+        <a class="nav-link" href="#" id="nav-my-stories">my stories</a> |
       </div>
       <div class="nav-right">
         <a class="nav-link" href="#" id="nav-login">login/signup</a>
@@ -67,13 +69,19 @@
       </form>
     </section>
 
-    <!-- area for stories (all stories, user stories, favorites) -->
+    <!-- area for stories (all stories, favorite stories, user stories) -->
     <section class="stories-container container">
       <!-- loading message (removed by JS after stories loaded) -->
       <div id="stories-loading-msg">Loading&hellip;</div>
 
       <!-- List of all stories -->
       <ol id="all-stories-list" class="stories-list"></ol>
+
+      <!-- List of favorite stories -->
+      <ul id="favorite-stories-list" class="stories-list"></ul>
+
+      <!-- List of user stories -->
+      <ul id="user-stories-list" class="stories-list"></ul>
     </section>
 
     <!-- Login and signup forms -->

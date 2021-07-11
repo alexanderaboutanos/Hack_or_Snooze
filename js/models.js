@@ -22,9 +22,10 @@ class Story {
 
   /** Parses hostname out of URL and returns it. */
 
-  getHostName() {
-    // UNIMPLEMENTED: complete this function!
-    return "hostname.com";
+  static getHostName(story) {
+    const newURL = new URL(story.url);
+    const hostName = newURL.hostname;
+    return hostName;
   }
 }
 
@@ -86,11 +87,16 @@ class StoryList {
       },
     });
 
+    console.log(response.data);
+
     // makes a Story instance
     const newStoryInst = new Story(response.data.story);
 
-    // adds new story instnace to story list.
+    // adds new story instance to story list.
     storyList.stories.unshift(newStoryInst);
+
+    // adds new story instance to 'my stories' list.
+    currentUser.ownStories.unshift(newStoryInst);
 
     //returns the new Story instance
     return newStoryInst;
@@ -165,6 +171,7 @@ class User {
     });
 
     let { user } = response.data;
+    console.debug("this is my tokenid: ", response.data.token);
 
     return new User(
       {
@@ -207,4 +214,77 @@ class User {
       return null;
     }
   }
+
+  /**  toggle story as favorite
+   */
+
+  static async toggleStoryFavorite(currentUser, storyId) {
+    console.debug("toggleStoryFavorite");
+
+    // determine if we need to delete or add(post) this story as a favorite
+    let determineMethod = function () {
+      // isFavoriteStory(currentUser, storyId) === true ? "DELETE" : "POST";
+      if (isFavoriteStory(currentUser, storyId) === true) {
+        return "DELETE";
+      } else {
+        return "POST";
+      }
+    };
+    console.log("determined method: ", determineMethod());
+
+    // send the API request
+    const response = await axios({
+      url: `${BASE_URL}/users/${currentUser.username}/favorites/${storyId}/`,
+      method: determineMethod(),
+      params: { token: currentUser.loginToken },
+    });
+
+    // the respose gives an entirely updated list of favorites.
+    const updatedFavoriteList = response.data.user.favorites;
+
+    // update the currentUser's favorite list on the global window
+    currentUser.favorites = updatedFavoriteList;
+    return updatedFavoriteList;
+  }
+
+  /**  function to delete a story
+   */
+
+  static async deleteStory(currentUser, storyId) {
+    console.debug("deleteStory");
+
+    // send the API request
+    const response = await axios({
+      url: `${BASE_URL}/stories/${storyId}/`,
+      method: "DELETE",
+      params: { token: currentUser.loginToken },
+    });
+    console.log("it worked! you deleted: ", response);
+
+    // update the currentUser's ownStories on the global window
+    currentUser.ownStories = currentUser.ownStories.filter(function (val) {
+      return val.storyId !== storyId;
+    });
+
+    // update the currentUser's favorite stories
+    currentUser.favorites = currentUser.favorites.filter(function (val) {
+      return val.storyId !== storyId;
+    });
+
+    // update the storyList on the global window
+    storyList.stories = storyList.stories.filter(function (val) {
+      return val.storyId !== storyId;
+    });
+
+    return response;
+  }
+}
+
+function isFavoriteStory(currentUser, storyId) {
+  for (let favoriteStory of currentUser.favorites) {
+    if (favoriteStory.storyId === storyId) {
+      return true;
+    }
+  }
+  return false;
 }

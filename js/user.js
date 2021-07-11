@@ -21,7 +21,7 @@ async function login(evt) {
   // which we'll make the globally-available, logged-in user.
   currentUser = await User.login(username, password);
 
-  // Alexander: "I don't quite understand"
+  //I don't quite understand this line...
   $loginForm.trigger("reset");
 
   saveUserCredentialsInLocalStorage();
@@ -111,7 +111,61 @@ function saveUserCredentialsInLocalStorage() {
 function updateUIOnUserLogin() {
   console.debug("updateUIOnUserLogin");
 
+  hidePageComponents();
+
+  putStoriesOnPage();
   $allStoriesList.show();
 
   updateNavOnLogin();
 }
+
+/** Handle click of favorite button
+ *
+ *
+ */
+
+function handleFavoriteIconClick(evt) {
+  console.debug("handleFavoriteIconClick");
+
+  // grab the id of the story you clicked on
+  let storyId = evt.target.closest("li").id;
+  console.log("this is the storyId: ", storyId);
+
+  // toggle the favorite story (send to API and update currentUser favorite list)
+  User.toggleStoryFavorite(currentUser, storyId);
+
+  // switch star type
+  const iElement = evt.target;
+  if (iElement.classList.contains("filled-star")) {
+    iElement.classList.remove("filled-star");
+    iElement.classList.add("empty-star");
+  } else {
+    iElement.classList.remove("empty-star");
+    iElement.classList.add("filled-star");
+  }
+
+  // putFavoritesListOnPage();
+}
+
+$body.on("click", ".fav-star", handleFavoriteIconClick);
+
+/** Handle click of delete button
+ *
+ *
+ */
+
+function handleDeleteIconClick(evt) {
+  console.debug("handleDeleteIconClick");
+
+  // grab the id of the story you clicked on
+  let storyId = evt.target.closest("li").id;
+  console.log("this is the storyId: ", storyId);
+
+  // send to API to delete
+  User.deleteStory(currentUser, storyId);
+
+  // Delete target li
+  evt.target.closest("li").remove();
+}
+
+$body.on("click", ".garbage-can", handleDeleteIconClick);
